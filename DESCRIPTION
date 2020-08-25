@@ -8,6 +8,8 @@ Imports:
     config,
     golem (>= 0.2.1.90),
     shiny (>= 1.5.0),
+    shinyjs,
+    shinydashboard
 Remotes: Thinkr-open/golem
 Encoding: UTF-8
 LazyData: true
