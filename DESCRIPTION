@@ -6,13 +6,15 @@ Description: A shiny module to authenticate your R Shiny Application with a Post
 License: MIT + file LICENSE
 Imports: 
     config,
-    golem,
-    shiny,
-    processx
+    golem (>= 0.2.1.90),
+    shiny (>= 1.5.0),
+Remotes: Thinkr-open/golem
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
 Suggests: 
-    testthat,
-    spelling
+    htmltools,
+    processx,
+    spelling,
+    testthat
 Language: en-US
