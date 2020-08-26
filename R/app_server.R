@@ -7,5 +7,9 @@
 app_server <- function( input, output, session ) {
   # List the first level callModules here
   postgresql_setup_vars <- postgresql_setup_server('postgresql-setup')
+  
+  observeEvent(input$debug, {
+    browser()
+  })
 
 }
