@@ -27,7 +27,9 @@ postgresql_setup_ui <- function(id){
                             actionButton(inputId = ns('connect'),
                                          label = 'Connect',
                                          icon = icon(name = 'database')
-                            )
+                                         
+                            ),
+                            uiOutput(ns('setup_connect_error'))
         )
     )
  
@@ -68,6 +70,15 @@ postgresql_setup_server <- function(id) {
         password = NULL
         )
       
+      ## Reactive UI Elements ----
+      pg_connect_error <- eventReactive(postgresql_setup$db_con, {
+        if(postgresql_setup$db_con == 'connection_error') {
+          return(HTML("<font color='#e83a2f'>Please verify your PostgreSQL settings. For assistance with parameters, contact your database administrator.</font>"))
+        } else {
+          return(NULL)
+          }
+        })
+      
       ## Observe Connect Button ----
       observeEvent(input$connect,{
         postgresql_setup$db_con <- tryCatch({
@@ -89,6 +100,7 @@ postgresql_setup_server <- function(id) {
         })
       
       ## Monitor DBI Connection Object  ----
+      
       ### Check for valid connection information
       observeEvent(postgresql_setup$db_con, {
         if(postgresql_setup$db_con %>% class() == 'PostgreSQLConnection') {
@@ -99,6 +111,9 @@ postgresql_setup_server <- function(id) {
           postgresql_setup$user <- input$user
         }
       })
+      
+      ## PostgreSQL Connection UI Outputs
+      output$setup_connect_error = renderUI({ pg_connect_error() })
       return(postgresql_setup)
       }
     )
