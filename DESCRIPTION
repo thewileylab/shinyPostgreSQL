@@ -23,3 +23,5 @@ Suggests:
     spelling,
     testthat
 Language: en-US
+URL: https://github.com/thewileylab/shinyPostgreSQL
+BugReports: https://github.com/thewileylab/shinyPostgreSQL/issues
