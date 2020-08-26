@@ -25,11 +25,7 @@ postgresql_setup_ui <- function(id){
                             textInput(inputId = ns('port'), label = 'Port:', value = 5432),
                             textInput(inputId = ns('username'), label = 'Username:'),
                             passwordInput(inputId = ns('password'), label = 'Password:'),
-                            actionButton(inputId = ns('connect'),
-                                         label = 'Connect',
-                                         icon = icon(name = 'database')
-                                         
-                            ),
+                            uiOutput(ns('setup_connect_btn')),
                             uiOutput(ns('setup_connect_error'))
         )
     )
@@ -78,6 +74,26 @@ postgresql_setup_server <- function(id) {
       # https://github.com/tomoakin/RPostgreSQL/issues/102
       
       ## Reactive UI Elements ----
+      pg_connect_btn <- reactive({
+        # Must enter SOMETHING in order to connect. Hide the connect button until "something" is added. 
+        # I'm not your mother, use a password or don't. 
+        req(input$dbname, 
+            input$host,
+            # input$schema,
+            input$port, 
+            input$username
+            )
+        # Add schema to conditions after testing
+        if(input$dbname == '' | input$host == '' | input$port == '' | input$username == '') {
+          return(NULL)
+        } else {
+        actionButton(inputId = ns('connect'),
+                     label = 'Connect',
+                     icon = icon(name = 'database')
+                     )
+          }
+        })
+      
       pg_connect_error <- eventReactive(postgresql_setup$db_con_class, {
         req(postgresql_setup$db_con_class == 'character')
         if(postgresql_setup$db_con == 'connection_error' | postgresql_setup$db_con == 'connection_warning') {
@@ -115,6 +131,7 @@ postgresql_setup_server <- function(id) {
       ## Monitor DBI Connection Object  ----
       
       ### Check for valid connection information
+      # If the conditions are sorted out appropriately in the previous chunk, this work flow should continue to function.
       observeEvent(postgresql_setup$db_con, {
         postgresql_setup$db_con_class <- postgresql_setup$db_con %>% class() %>% magrittr::extract(1)
         if(postgresql_setup$db_con_class == 'PqConnection') {
@@ -127,8 +144,11 @@ postgresql_setup_server <- function(id) {
         }
       })
       
-      ## PostgreSQL Connection UI Outputs
-      output$setup_connect_error = renderUI({ pg_connect_error() })
+      ## PostgreSQL Connection UI Outputs ----
+      output$setup_connect_btn <- renderUI({ pg_connect_btn() })
+      output$setup_connect_error <- renderUI({ pg_connect_error() })
+      
+      ## Return ----
       return(postgresql_setup)
       }
     )
