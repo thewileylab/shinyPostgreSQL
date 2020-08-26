@@ -69,6 +69,7 @@ postgresql_setup_server <- function(id) {
                                                   password = input$password
                                                   )
           })
+      return(postgresql_setup)
       }
     )
 }
