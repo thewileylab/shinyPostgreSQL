@@ -1,5 +1,5 @@
 # UI ----
-#' BigQuery Setup UI
+#' PostgreSQL Setup UI
 #'
 #' This module is designed to guide a user through the process of authenticating with a PostgreSQL database. It is responsible for creating a DBI connection object to a PostgreSQL database.
 #' @param id The Module namespace
