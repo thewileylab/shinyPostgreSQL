@@ -8,15 +8,16 @@
 #' @export
 #' 
 #' @importFrom shiny NS tagList 
+#' @importFrom shinycssloaders withSpinner
 postgresql_setup_ui <- function(id){
   ns <- NS(id)
   tagList(
     golem_add_external_resources(),
-    div(id = ns('postgresql_connect_div'),
-        shinydashboard::box(title = 'Connect to PostgreSQL Database',
-                            width = '100%',
-                            status = 'primary',
-                            solidHeader = F,
+    shinydashboard::box(title = 'Connect to PostgreSQL Database',
+                        width = '100%',
+                        status = 'primary',
+                        solidHeader = F,
+                        div(id = ns('postgresql_connect_div'),
                             HTML('To connect to a PostgreSQL Database, please provide your credentials.<br><br>'),
                             br(),
                             textInput(inputId = ns('dbname'), label = 'Database Name:'),
@@ -27,7 +28,11 @@ postgresql_setup_ui <- function(id){
                             passwordInput(inputId = ns('password'), label = 'Password:'),
                             uiOutput(ns('setup_connect_btn')),
                             uiOutput(ns('setup_connect_error'))
+                            ),
+                        div(id = ns('postgresql_connect_success_div'),
+                            uiOutput(ns('setup_connect_success')) %>% shinycssloaders::withSpinner()
                             )
+                            
         )
     )
   }
@@ -42,10 +47,11 @@ postgresql_setup_ui <- function(id){
 #' @export
 #' 
 #' @importFrom DBI dbConnect
-#' @importFrom RPostgres Postgres
+#' @importFrom RPostgres Postgres dbDisconnect
 #' @importFrom magrittr %>% 
 #' @importFrom glue glue
 #' @importFrom magrittr extract
+#' @importFrom shinyjs hide show reset
 postgresql_setup_server <- function(id) {
   moduleServer(
     id,
@@ -64,8 +70,7 @@ postgresql_setup_server <- function(id) {
         # schema = NULL,
         host = NULL,
         port = NULL,
-        user = NULL,
-        password = NULL
+        username = NULL
         )
       ## Schema TBD (Ideally, we want this as part of the connection object)
       # https://stackoverflow.com/questions/42139964/setting-the-schema-name-in-postgres-using-r
@@ -106,7 +111,8 @@ postgresql_setup_server <- function(id) {
                      'You have connected to the', postgresql_setup$dbname, 'database.',
                      '<br>',
                      '<br>',
-                     '<H4>User Information:</H4>', postgresql_setup$username, 
+                     '<H4>Database Information:</H4>', 
+                     'Username:', postgresql_setup$username, 
                      '<br><br>',
                      '<b>Please make a note of it.</b>',
                      '<br><br>')
@@ -124,7 +130,7 @@ postgresql_setup_server <- function(id) {
                          dbname = input$dbname, 
                          host = input$host, # i.e. 'ec2-54-83-201-96.compute-1.amazonaws.com'
                          port = input$port, # or any other port specified by your DBA
-                         user = input$user,
+                         user = input$username,
                          password = input$password
                          # options = glue::glue('-c search_path={input$schema}') ## ensure this works with tbl(con, 'table_name') convention
                          )
@@ -146,16 +152,30 @@ postgresql_setup_server <- function(id) {
         postgresql_setup$db_con_class <- postgresql_setup$db_con %>% class() %>% magrittr::extract(1)
         if(postgresql_setup$db_con_class == 'PqConnection') {
           message('DB Connection Established')
+          shinyjs::hide('postgresql_connect_div')
           postgresql_setup$is_connected <- 'yes'
           postgresql_setup$dbname <- input$dbname
           postgresql_setup$host <- input$host
           postgresql_setup$port <- input$port
-          postgresql_setup$user <- input$user
+          postgresql_setup$username <- input$username
         }
       })
       
       ## Observe disconnect Button ----
-      
+      observeEvent(input$pg_disconnect, {
+        if ( input$pg_disconnect == 0 ) return()
+        RPostgres::dbDisconnect(postgresql_setup$db_con) ## Disconnect from database
+        postgresql_setup$is_connected <- 'no'
+        postgresql_setup$db_con <- NULL
+        message('DB Connection Destroyed')
+        postgresql_setup$dbname <- NULL
+        # postgresql_setup$schema <- NULL
+        postgresql_setup$host <- NULL
+        postgresql_setup$port <- NULL
+        postgresql_setup$username <- NULL
+        shinyjs::show('postgresql_connect_div')
+        shinyjs::reset('postgresql_connect_div')
+        })
       
       ## PostgreSQL Connection UI Outputs ----
       output$setup_connect_btn <- renderUI({ pg_connect_btn() })
