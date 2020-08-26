@@ -86,7 +86,7 @@ postgresql_setup_server <- function(id) {
         if(input$dbname == '' | input$host == '' | input$port == '' | input$username == '') {
           return(NULL)
         } else {
-          actionButton(inputId = ns('connect'), label = 'Connect', icon = icon(name = 'database') )
+          actionButton(inputId = ns('pg_connect'), label = 'Connect', icon = icon(name = 'database') )
           }
         })
       
@@ -99,8 +99,22 @@ postgresql_setup_server <- function(id) {
           }
         })
       
+      pg_connected_message <- eventReactive(postgresql_setup$is_connected, {
+        req(postgresql_setup$is_connected == 'yes')
+        # Not sure what else is interesting about connecting
+        HTML(paste('<H3>Success!!</H3>', 
+                     'You have connected to the', postgresql_setup$dbname, 'database.',
+                     '<br>',
+                     '<br>',
+                     '<H4>User Information:</H4>', postgresql_setup$username, 
+                     '<br><br>',
+                     '<b>Please make a note of it.</b>',
+                     '<br><br>')
+             )
+        })
+      
       ## Observe Connect Button ----
-      observeEvent(input$connect,{
+      observeEvent(input$pg_connect, {
         # browser()
         # Depending on PostgreSQL config, this tryCatch will be insufficient. Eg, my local PostgreSQL install will accept totally blank
         # connection info as valid, forming a temporary connection. Ideally, this would be combined with dbListTables() to verify that 
@@ -140,9 +154,19 @@ postgresql_setup_server <- function(id) {
         }
       })
       
+      ## Observe disconnect Button ----
+      
+      
       ## PostgreSQL Connection UI Outputs ----
       output$setup_connect_btn <- renderUI({ pg_connect_btn() })
       output$setup_connect_error <- renderUI({ pg_connect_error() })
+      output$setup_connect_success <- renderUI({
+        req(pg_connected_message() )
+        tagList(
+          pg_connected_message(),
+          actionButton(inputId = ns('pg_disconnect'), label = 'Disconnect')
+        )
+      })
       
       ## Return ----
       return(postgresql_setup)
