@@ -14,7 +14,8 @@ Imports:
     RPostgres,
     DBI,
     glue,
-    magrittr
+    magrittr,
+    shinycssloaders
 Remotes: Thinkr-open/golem
 Encoding: UTF-8
 LazyData: true
