@@ -20,6 +20,7 @@ postgresql_setup_ui <- function(id){
                             HTML('To connect to a PostgreSQL Database, please provide your credentials.<br><br>'),
                             br(),
                             textInput(inputId = ns('dbname'), label = 'Database Name:'),
+                            # textInput(inputId = ns('schema'), label = 'Schema:'),
                             textInput(inputId = ns('host'), label = 'Hostname:', placeholder = 'ec2-54-83-201-96.compute-1.amazonaws.com'),
                             textInput(inputId = ns('port'), label = 'Port:', value = 5432),
                             textInput(inputId = ns('username'), label = 'Username:'),
@@ -49,6 +50,7 @@ postgresql_setup_ui <- function(id){
 #' @importFrom RPostgres Postgres
 #' @importFrom magrittr %>% 
 #' @importFrom glue glue
+#' @importFrom magrittr extract
 postgresql_setup_server <- function(id) {
   moduleServer(
     id,
@@ -64,15 +66,21 @@ postgresql_setup_server <- function(id) {
         is_connected = 'no',
         db_con = NULL,
         dbname = NULL,
+        # schema = NULL,
         host = NULL,
         port = NULL,
         user = NULL,
         password = NULL
         )
+      ## Schema TBD (Ideally, we want this as part of the connection object)
+      # https://stackoverflow.com/questions/42139964/setting-the-schema-name-in-postgres-using-r
+      # https://github.com/r-dbi/DBI/issues/24
+      # https://github.com/tomoakin/RPostgreSQL/issues/102
       
       ## Reactive UI Elements ----
-      pg_connect_error <- eventReactive(postgresql_setup$db_con, {
-        if(postgresql_setup$db_con == 'connection_error') {
+      pg_connect_error <- eventReactive(postgresql_setup$db_con_class, {
+        req(postgresql_setup$db_con_class == 'character')
+        if(postgresql_setup$db_con == 'connection_error' | postgresql_setup$db_con == 'connection_warning') {
           return(HTML("<font color='#e83a2f'>Please verify your PostgreSQL settings. For assistance with parameters, contact your database administrator.</font>"))
         } else {
           return(NULL)
@@ -81,6 +89,10 @@ postgresql_setup_server <- function(id) {
       
       ## Observe Connect Button ----
       observeEvent(input$connect,{
+        # browser()
+        # Depending on PostgreSQL config, this tryCatch will be insufficient. Eg, my local PostgreSQL install will accept totally blank
+        # connection info as valid, forming a temporary connection. Ideally, this would be combined with dbListTables() to verify that 
+        # tables exist before storing a connection object.
         postgresql_setup$db_con <- tryCatch({
           DBI::dbConnect(RPostgres::Postgres(),
                          dbname = input$dbname, 
@@ -88,6 +100,7 @@ postgresql_setup_server <- function(id) {
                          port = input$port, # or any other port specified by your DBA
                          user = input$user,
                          password = input$password
+                         # options = glue::glue('-c search_path={input$schema}') ## ensure this works with tbl(con, 'table_name') convention
                          )
           }, warning = function(w) {
             message(glue::glue('{w}'))
@@ -103,7 +116,9 @@ postgresql_setup_server <- function(id) {
       
       ### Check for valid connection information
       observeEvent(postgresql_setup$db_con, {
-        if(postgresql_setup$db_con %>% class() == 'PostgreSQLConnection') {
+        postgresql_setup$db_con_class <- postgresql_setup$db_con %>% class() %>% magrittr::extract(1)
+        if(postgresql_setup$db_con_class == 'PqConnection') {
+          message('DB Connection Established')
           postgresql_setup$is_connected <- 'yes'
           postgresql_setup$dbname <- input$dbname
           postgresql_setup$host <- input$host
