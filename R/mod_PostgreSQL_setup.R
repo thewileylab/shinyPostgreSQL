@@ -27,11 +27,10 @@ postgresql_setup_ui <- function(id){
                             passwordInput(inputId = ns('password'), label = 'Password:'),
                             uiOutput(ns('setup_connect_btn')),
                             uiOutput(ns('setup_connect_error'))
+                            )
         )
     )
- 
-  )
-}
+  }
 
 
 # Server ----    
