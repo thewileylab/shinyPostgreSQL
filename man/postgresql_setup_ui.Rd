@@ -2,7 +2,7 @@
 % Please edit documentation in R/mod_PostgreSQL_setup.R
 \name{postgresql_setup_ui}
 \alias{postgresql_setup_ui}
-\title{BigQuery Setup UI}
+\title{PostgreSQL Setup UI}
 \usage{
 postgresql_setup_ui(id)
 }
