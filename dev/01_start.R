@@ -20,7 +20,7 @@ golem::fill_desc(
   author_first_name = "David", # Your First Name
   author_last_name = "Mayer", # Your Last Name
   author_email = "david.mayer@cuanschutz.edu", # Your Email
-  repo_url = NULL # The URL of the GitHub Repo (optional) 
+  repo_url = 'https://github.com/thewileylab/shinyPostgreSQL' # The URL of the GitHub Repo (optional) 
 )     
 
 ## Set {golem} options ----
