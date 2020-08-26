@@ -11,7 +11,25 @@
 postgresql_setup_ui <- function(id){
   ns <- NS(id)
   tagList(
-    golem_add_external_resources()
+    golem_add_external_resources(),
+    div(id = ns('postgresql_connect_div'),
+        shinydashboard::box(title = 'Connect to PostgreSQL Database',
+                            width = '100%',
+                            status = 'primary',
+                            solidHeader = F,
+                            HTML('To connect to a PostgreSQL Database, please provide your credentials.<br><br>'),
+                            br(),
+                            textInput(inputId = ns('dbname'), label = 'Database Name:'),
+                            textInput(inputId = ns('host'), label = 'Hostname:', placeholder = 'ec2-54-83-201-96.compute-1.amazonaws.com'),
+                            textInput(inputId = ns('port'), label = 'Port:', value = 5432),
+                            textInput(inputId = ns('username'), label = 'Username:'),
+                            passwordInput(inputId = ns('password'), label = 'Password:'),
+                            actionButton(inputId = ns('connect'),
+                                         label = 'Connect',
+                                         icon = icon(name = 'database')
+                            )
+        )
+    )
  
   )
 }
@@ -25,6 +43,8 @@ postgresql_setup_ui <- function(id){
 #' @return PostgreSQL connection variables and DBI connection object.
 #' @export
 #' 
+#' @importFrom DBI dbConnect
+#' @importFrom RPostgres Postgres
 postgresql_setup_server <- function(id) {
   moduleServer(
     id,
@@ -37,7 +57,18 @@ postgresql_setup_server <- function(id) {
         moduleType = 'database',
         ui = shinyPostgreSQL::postgresql_setup_ui(id),
         ### Connection Variables
+        is_connected = 'no',
+        db_con = NULL
         )
+      observeEvent(input$connect,{
+        postgresql_setup$db_con <- DBI::dbConnect(RPostgres::Postgres(),
+                                                  dbname = input$dbname, 
+                                                  host = input$host, # i.e. 'ec2-54-83-201-96.compute-1.amazonaws.com'
+                                                  port = input$port, # or any other port specified by your DBA
+                                                  user = input$user,
+                                                  password = input$password
+                                                  )
+          })
       }
     )
-  }
+}
