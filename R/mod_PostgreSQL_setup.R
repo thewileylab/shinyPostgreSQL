@@ -45,6 +45,8 @@ postgresql_setup_ui <- function(id){
 #' 
 #' @importFrom DBI dbConnect
 #' @importFrom RPostgres Postgres
+#' @importFrom magrittr %>% 
+#' @importFrom glue glue
 postgresql_setup_server <- function(id) {
   moduleServer(
     id,

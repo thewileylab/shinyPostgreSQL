@@ -12,7 +12,9 @@ Imports:
     shinydashboard,
     shinyWidgets,
     RPostgres,
-    DBI
+    DBI,
+    glue,
+    magrittr
 Remotes: Thinkr-open/golem
 Encoding: UTF-8
 LazyData: true
