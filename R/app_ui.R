@@ -10,7 +10,8 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     # List the first level UI elements here 
     fluidPage(
-      h1("shinyPostgreSQL")
+      h1("shinyPostgreSQL"),
+      postgresql_setup_ui('postgresql-setup')
     )
   )
 }
