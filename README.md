@@ -9,7 +9,9 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 <!-- badges: end -->
 
-The goal of shinyPostgreSQL is to …
+The goal of shinyPostgreSQL is to allow a Shiny application to
+authenticate with a PostgreSQL database by prompting a user for
+appropriate credentials and forming a DBI connection object.
 
 ## Installation
 
