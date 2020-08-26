@@ -11,7 +11,8 @@ Imports:
     shinyjs,
     shinydashboard,
     shinyWidgets,
-    RPostgres
+    RPostgres,
+    DBI
 Remotes: Thinkr-open/golem
 Encoding: UTF-8
 LazyData: true
