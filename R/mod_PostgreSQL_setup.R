@@ -87,10 +87,7 @@ postgresql_setup_server <- function(id) {
         if(input$dbname == '' | input$host == '' | input$port == '' | input$username == '') {
           return(NULL)
         } else {
-        actionButton(inputId = ns('connect'),
-                     label = 'Connect',
-                     icon = icon(name = 'database')
-                     )
+          actionButton(inputId = ns('connect'), label = 'Connect', icon = icon(name = 'database') )
           }
         })
       
