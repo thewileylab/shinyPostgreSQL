@@ -41,7 +41,7 @@ your applications ui and server functions respectively.
 library(shiny)
 library(shinyPostgreSQL)
 ui <- fluidPage(
-  tags$h2('Connect to BigQuery UI'),
+  tags$h2('Connect to Database UI'),
   postgresql_setup_ui(id = 'setup-namespace')
   )
 

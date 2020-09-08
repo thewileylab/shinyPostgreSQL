@@ -46,7 +46,7 @@ To integrate shinyPostgreSQL with your Shiny application place `postgresql_setup
 library(shiny)
 library(shinyPostgreSQL)
 ui <- fluidPage(
-  tags$h2('Connect to BigQuery UI'),
+  tags$h2('Connect to Database UI'),
   postgresql_setup_ui(id = 'setup-namespace')
   )
 
