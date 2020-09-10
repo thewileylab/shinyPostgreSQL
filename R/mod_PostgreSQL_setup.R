@@ -62,7 +62,7 @@ postgresql_setup_server <- function(id) {
         ### Module Info
         moduleName = 'PostgreSQL',
         moduleType = 'database',
-        ui = shinyPostgreSQL::postgresql_setup_ui,
+        setup_ui = shinyPostgreSQL::postgresql_setup_ui,
         ### Connection Variables
         is_connected = 'no',
         db_con = NULL,
