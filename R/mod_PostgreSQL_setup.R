@@ -20,10 +20,10 @@ postgresql_setup_ui <- function(id){
                         div(id = ns('postgresql_connect_div'),
                             HTML('To connect to a PostgreSQL Database, please provide your credentials.<br><br>'),
                             br(),
-                            textInput(inputId = ns('dbname'), label = 'Database Name:'),
-                            # textInput(inputId = ns('schema'), label = 'Schema:'),
                             textInput(inputId = ns('host'), label = 'Hostname:', placeholder = 'ec2-54-83-201-96.compute-1.amazonaws.com'),
                             textInput(inputId = ns('port'), label = 'Port:', value = 5432),
+                            textInput(inputId = ns('dbname'), label = 'Database Name:'),
+                            textInput(inputId = ns('schema'), label = 'Schema:'),
                             textInput(inputId = ns('username'), label = 'Username:'),
                             passwordInput(inputId = ns('password'), label = 'Password:'),
                             uiOutput(ns('setup_connect_btn')),
@@ -67,7 +67,7 @@ postgresql_setup_server <- function(id) {
         is_connected = 'no',
         db_con = NULL,
         dbname = NULL,
-        # schema = NULL,
+        schema = NULL,
         host = NULL,
         port = NULL,
         username = NULL
@@ -79,20 +79,20 @@ postgresql_setup_server <- function(id) {
       
       ## Reactive UI Elements ----
       pg_connect_btn <- reactive({
-        # Must enter SOMETHING in order to connect. Hide the connect button until "something" is added. 
-        # I'm not your mother, use a password or don't. 
+        # Hide the connect button until "something" is added for host, port, dbname, and user. 
+          ## Schema not necessarily required for successful connections.
+          ## I'm not your mother, use a password or don't. 
         req(input$dbname, 
             input$host,
-            # input$schema,
             input$port, 
             input$username
             )
-        # Add schema to conditions after testing
+        # Return NULL until user input is present
         if(input$dbname == '' | input$host == '' | input$port == '' | input$username == '') {
           return(NULL)
-        } else {
-          actionButton(inputId = ns('pg_connect'), label = 'Connect', icon = icon(name = 'database') )
-          }
+          } else {
+            actionButton(inputId = ns('pg_connect'), label = 'Connect', icon = icon(name = 'database') )
+            }
         })
       
       pg_connect_error <- eventReactive(postgresql_setup$db_con_class, {
@@ -126,14 +126,24 @@ postgresql_setup_server <- function(id) {
         # connection info as valid, forming a temporary connection. Ideally, this would be combined with dbListTables() to verify that 
         # tables exist before storing a connection object.
         postgresql_setup$db_con <- tryCatch({
-          DBI::dbConnect(RPostgres::Postgres(),
-                         dbname = input$dbname, 
-                         host = input$host, # i.e. 'ec2-54-83-201-96.compute-1.amazonaws.com'
-                         port = input$port, # or any other port specified by your DBA
-                         user = input$username,
-                         password = input$password
-                         # options = glue::glue('-c search_path={input$schema}') ## ensure this works with tbl(con, 'table_name') convention
-                         )
+          if(input$schema != '') {
+            DBI::dbConnect(RPostgres::Postgres(),
+                           dbname = input$dbname, 
+                           host = input$host, # i.e. 'ec2-54-83-201-96.compute-1.amazonaws.com'
+                           port = input$port, # or any other port specified by your DBA
+                           user = input$username,
+                           password = input$password,
+                           options = glue::glue('-c search_path={input$schema}') ## ensure this works with tbl(con, 'table_name') convention
+                           )
+            } else {
+              DBI::dbConnect(RPostgres::Postgres(),
+                             dbname = input$dbname, 
+                             host = input$host, # i.e. 'ec2-54-83-201-96.compute-1.amazonaws.com'
+                             port = input$port, # or any other port specified by your DBA
+                             user = input$username,
+                             password = input$password
+                             )
+              }
           }, warning = function(w) {
             message(glue::glue('{w}'))
             return('connection_warning')
