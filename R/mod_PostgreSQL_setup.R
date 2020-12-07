@@ -20,10 +20,10 @@ postgresql_setup_ui <- function(id){
                         div(id = ns('postgresql_connect_div'),
                             HTML('To connect to a PostgreSQL Database, please provide your credentials.<br><br>'),
                             br(),
-                            textInput(inputId = ns('host'), label = 'Hostname:', placeholder = 'ec2-54-83-201-96.compute-1.amazonaws.com'),
+                            textInput(inputId = ns('host'), label = 'Hostname:', placeholder = 'e.g., ec2-54-83-201-96.compute-1.amazonaws.com'),
                             textInput(inputId = ns('port'), label = 'Port:', value = 5432),
                             textInput(inputId = ns('dbname'), label = 'Database Name:'),
-                            textInput(inputId = ns('schema'), label = 'Schema:'),
+                            textInput(inputId = ns('schema'), label = 'Schema:', placeholder = 'Optional, if using default "public" schema.'),
                             textInput(inputId = ns('username'), label = 'Username:'),
                             passwordInput(inputId = ns('password'), label = 'Password:'),
                             uiOutput(ns('setup_connect_btn')),
@@ -32,11 +32,9 @@ postgresql_setup_ui <- function(id){
                         div(id = ns('postgresql_connect_success_div'),
                             uiOutput(ns('setup_connect_success')) %>% shinycssloaders::withSpinner()
                             )
-                            
-        )
+                        )
     )
   }
-
 
 # Server ----    
 #' mod_PostgreSQL_setup Server Function
@@ -77,22 +75,18 @@ postgresql_setup_server <- function(id) {
         username = NULL,
         db_con_class = NULL
         )
-      ## Schema TBD (Ideally, we want this as part of the connection object)
-      # https://stackoverflow.com/questions/42139964/setting-the-schema-name-in-postgres-using-r
-      # https://github.com/r-dbi/DBI/issues/24
-      # https://github.com/tomoakin/RPostgreSQL/issues/102
       
       ## Reactive UI Elements ----
       pg_connect_btn <- reactive({
         # Hide the connect button until "something" is added for host, port, dbname, and user. 
-          ## Schema not necessarily required for successful connections.
+          ## Schema not required for successful connections. Default to 'public' schema if not user supplied.
           ## I'm not your mother, use a password or don't. 
         req(input$dbname, 
             input$host,
             input$port, 
             input$username
             )
-        # Return NULL until user input is present
+        # Return NULL until user input is present for the following inputs
         if(input$dbname == '' | input$host == '' | input$port == '' | input$username == '') {
           return(NULL)
           } else {
@@ -111,7 +105,7 @@ postgresql_setup_server <- function(id) {
       
       pg_connected_message <- eventReactive(postgresql_export$is_connected, {
         req(postgresql_export$is_connected == 'yes')
-        # Not sure what else is interesting about connecting
+        # Connection Success Message
         HTML(paste('<H3>Success!!</H3>', 
                      'You have connected to the', postgresql_setup$dbname, 'database.',
                      '<br>',
@@ -146,7 +140,7 @@ postgresql_setup_server <- function(id) {
             } else {
               DBI::dbConnect(RPostgres::Postgres(),
                              dbname = input$dbname, 
-                             host = input$host, # i.e. 'ec2-54-83-201-96.compute-1.amazonaws.com'
+                             host = input$host, # e.g., 'ec2-54-83-201-96.compute-1.amazonaws.com'
                              port = input$port, # or any other port specified by your DBA
                              user = input$username,
                              password = input$password
@@ -205,11 +199,12 @@ postgresql_setup_server <- function(id) {
         tagList(
           pg_connected_message(),
           actionButton(inputId = ns('pg_disconnect'), label = 'Disconnect')
-        )
-      })
+          )
+        })
       
       ## Return ----
       return(postgresql_export)
+      
       }
     )
 }
