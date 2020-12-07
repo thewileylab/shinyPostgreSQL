@@ -169,7 +169,7 @@ postgresql_setup_server <- function(id) {
       observeEvent(postgresql_export$db_con, {
         postgresql_setup$db_con_class <- postgresql_export$db_con %>% class() %>% magrittr::extract(1)
         if(postgresql_setup$db_con_class == 'PqConnection') {
-          message('DB Connection Established')
+          message('PostgreSQL Database Connection Established')
           shinyjs::hide('postgresql_connect_div')
           postgresql_setup$host <- input$host
           postgresql_setup$port <- input$port
@@ -186,7 +186,7 @@ postgresql_setup_server <- function(id) {
         RPostgres::dbDisconnect(postgresql_export$db_con) ## Disconnect from database
         postgresql_export$is_connected <- 'no'
         postgresql_export$db_con <- NULL
-        message('DB Connection Disconnected')
+        message('PostgreSQL Disconnected')
         postgresql_setup$host <- NULL
         postgresql_setup$port <- NULL
         postgresql_setup$dbname <- NULL
