@@ -112,9 +112,12 @@ postgresql_setup_server <- function(id) {
                      '<br>',
                      '<br>',
                      '<H4>Database Information:</H4>', 
-                     'Username:', postgresql_setup$username, 
+                     '<b>Username:</b>', postgresql_setup$username, '<br>',
+                     '<b>Host:</b>', postgresql_setup$host, '<br>',
+                     '<b>Port:</b>', postgresql_setup$port, '<br>',
+                     '<b>Schema:</b>', postgresql_setup$schema,
                      '<br><br>',
-                     '<b>Please make a note of it.</b>',
+                     '<b>You may now proceed to record review.</b>',
                      '<br><br>')
              )
         })
@@ -163,11 +166,12 @@ postgresql_setup_server <- function(id) {
         if(postgresql_setup$db_con_class == 'PqConnection') {
           message('DB Connection Established')
           shinyjs::hide('postgresql_connect_div')
-          postgresql_setup$is_connected <- 'yes'
-          postgresql_setup$dbname <- input$dbname
           postgresql_setup$host <- input$host
           postgresql_setup$port <- input$port
+          postgresql_setup$schema <- if(input$schema == '') {'public'} else {input$schema}
+          postgresql_setup$dbname <- input$dbname
           postgresql_setup$username <- input$username
+          postgresql_setup$is_connected <- 'yes'
         }
       })
       
@@ -178,10 +182,10 @@ postgresql_setup_server <- function(id) {
         postgresql_setup$is_connected <- 'no'
         postgresql_setup$db_con <- NULL
         message('DB Connection Destroyed')
-        postgresql_setup$dbname <- NULL
-        # postgresql_setup$schema <- NULL
         postgresql_setup$host <- NULL
         postgresql_setup$port <- NULL
+        postgresql_setup$dbname <- NULL
+        postgresql_setup$schema <- NULL
         postgresql_setup$username <- NULL
         shinyjs::show('postgresql_connect_div')
         shinyjs::reset('postgresql_connect_div')
