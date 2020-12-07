@@ -57,20 +57,25 @@ postgresql_setup_server <- function(id) {
     id,
     function(input, output, session) {
       ns <- session$ns
-      ## PostgreSQL Setup Values ----
-      postgresql_setup <- reactiveValues(
+      ## PostgreSQL Export Values ----
+      postgresql_export <- reactiveValues(
         ### Module Info
         moduleName = 'PostgreSQL',
         moduleType = 'database',
         setup_ui = shinyPostgreSQL::postgresql_setup_ui,
         ### Connection Variables
         is_connected = 'no',
-        db_con = NULL,
+        db_con = NULL
+        )
+      
+      ## PostgreSQL Setup Values ----
+      postgresql_setup <- reactiveValues(
         dbname = NULL,
         schema = NULL,
         host = NULL,
         port = NULL,
-        username = NULL
+        username = NULL,
+        db_con_class = NULL
         )
       ## Schema TBD (Ideally, we want this as part of the connection object)
       # https://stackoverflow.com/questions/42139964/setting-the-schema-name-in-postgres-using-r
@@ -97,15 +102,15 @@ postgresql_setup_server <- function(id) {
       
       pg_connect_error <- eventReactive(postgresql_setup$db_con_class, {
         req(postgresql_setup$db_con_class == 'character')
-        if(postgresql_setup$db_con == 'connection_error' | postgresql_setup$db_con == 'connection_warning') {
+        if(postgresql_export$db_con == 'connection_error' | postgresql_export$db_con == 'connection_warning') {
           return(HTML("<font color='#e83a2f'>Please verify your PostgreSQL settings. For assistance with parameters, contact your database administrator.</font>"))
         } else {
           return(NULL)
           }
         })
       
-      pg_connected_message <- eventReactive(postgresql_setup$is_connected, {
-        req(postgresql_setup$is_connected == 'yes')
+      pg_connected_message <- eventReactive(postgresql_export$is_connected, {
+        req(postgresql_export$is_connected == 'yes')
         # Not sure what else is interesting about connecting
         HTML(paste('<H3>Success!!</H3>', 
                      'You have connected to the', postgresql_setup$dbname, 'database.',
@@ -128,7 +133,7 @@ postgresql_setup_server <- function(id) {
         # Depending on PostgreSQL config, this tryCatch will be insufficient. Eg, my local PostgreSQL install will accept totally blank
         # connection info as valid, forming a temporary connection. Ideally, this would be combined with dbListTables() to verify that 
         # tables exist before storing a connection object.
-        postgresql_setup$db_con <- tryCatch({
+        postgresql_export$db_con <- tryCatch({
           if(input$schema != '') {
             DBI::dbConnect(RPostgres::Postgres(),
                            dbname = input$dbname, 
@@ -161,8 +166,8 @@ postgresql_setup_server <- function(id) {
       
       ### Check for valid connection information
       # If the conditions are sorted out appropriately in the previous chunk, this work flow should continue to function.
-      observeEvent(postgresql_setup$db_con, {
-        postgresql_setup$db_con_class <- postgresql_setup$db_con %>% class() %>% magrittr::extract(1)
+      observeEvent(postgresql_export$db_con, {
+        postgresql_setup$db_con_class <- postgresql_export$db_con %>% class() %>% magrittr::extract(1)
         if(postgresql_setup$db_con_class == 'PqConnection') {
           message('DB Connection Established')
           shinyjs::hide('postgresql_connect_div')
@@ -171,22 +176,23 @@ postgresql_setup_server <- function(id) {
           postgresql_setup$schema <- if(input$schema == '') {'public'} else {input$schema}
           postgresql_setup$dbname <- input$dbname
           postgresql_setup$username <- input$username
-          postgresql_setup$is_connected <- 'yes'
+          postgresql_export$is_connected <- 'yes'
         }
       })
       
       ## Observe disconnect Button ----
       observeEvent(input$pg_disconnect, {
         if ( input$pg_disconnect == 0 ) return()
-        RPostgres::dbDisconnect(postgresql_setup$db_con) ## Disconnect from database
-        postgresql_setup$is_connected <- 'no'
-        postgresql_setup$db_con <- NULL
-        message('DB Connection Destroyed')
+        RPostgres::dbDisconnect(postgresql_export$db_con) ## Disconnect from database
+        postgresql_export$is_connected <- 'no'
+        postgresql_export$db_con <- NULL
+        message('DB Connection Disconnected')
         postgresql_setup$host <- NULL
         postgresql_setup$port <- NULL
         postgresql_setup$dbname <- NULL
         postgresql_setup$schema <- NULL
         postgresql_setup$username <- NULL
+        postgresql_setup$db_con_class <- NULL
         shinyjs::show('postgresql_connect_div')
         shinyjs::reset('postgresql_connect_div')
         })
@@ -203,7 +209,7 @@ postgresql_setup_server <- function(id) {
       })
       
       ## Return ----
-      return(postgresql_setup)
+      return(postgresql_export)
       }
     )
 }
