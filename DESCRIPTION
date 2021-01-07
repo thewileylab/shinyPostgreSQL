@@ -1,7 +1,10 @@
 Package: shinyPostgreSQL
 Title: shinyPostgreSQL: Access a PostgreSQL database through R Shiny
-Version: 0.0.0.9000
-Authors@R: person('David', 'Mayer', email = 'david.mayer@cuanschutz.edu', role = c('cre', 'aut'))
+Version: 0.0.1.0000
+Authors@R: c(
+            person('David', 'Mayer', email = 'david.mayer@cuanschutz.edu', role = c('cre', 'aut')),
+            person(given = "The Wiley Lab", role = c("cph", "fnd"))
+            )
 Description: A shiny module to authenticate your R Shiny Application with a PostgreSQL Database.
 License: MIT + file LICENSE
 Imports: 
