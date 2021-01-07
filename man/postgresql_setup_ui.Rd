@@ -15,3 +15,4 @@ The PostgreSQL Setup UI
 \description{
 This module is designed to guide a user through the process of authenticating with a PostgreSQL database. It is responsible for creating a DBI connection object to a PostgreSQL database.
 }
+\keyword{internal}

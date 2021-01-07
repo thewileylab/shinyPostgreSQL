@@ -1,3 +1,26 @@
+# Helpers ----
+#' Add external Resources to the Application
+#' 
+#' This function is internally used to add external 
+#' resources inside the Shiny application. 
+#' 
+#' @import shiny
+#' @importFrom golem add_resource_path activate_js favicon bundle_resources
+#' @noRd
+spg_add_external_resources <- function(){
+  
+  add_resource_path(
+    'www', app_sys('app/www')
+  )
+  
+  tags$head(
+    # Add here other external resources
+    # for example, you can add shinyalert::useShinyalert()
+    shinyjs::useShinyjs(),
+    shinyWidgets::useShinydashboard(),
+  )
+}
+
 # UI ----
 #' PostgreSQL Setup UI
 #'
@@ -5,6 +28,7 @@
 #' @param id The Module namespace
 #'
 #' @return The PostgreSQL Setup UI
+#' @keywords internal
 #' @export
 #' 
 #' @importFrom shiny NS tagList 
@@ -12,7 +36,7 @@
 postgresql_setup_ui <- function(id){
   ns <- NS(id)
   tagList(
-    golem_add_external_resources(),
+    spg_add_external_resources(),
     shinydashboard::box(title = 'Connect to PostgreSQL Database',
                         width = '100%',
                         status = 'primary',
@@ -42,6 +66,7 @@ postgresql_setup_ui <- function(id){
 #' @param id The PostgreSQL Setup UI
 #'
 #' @return PostgreSQL connection variables and DBI connection object.
+#' @keywords internal
 #' @export
 #' 
 #' @importFrom DBI dbConnect
@@ -115,9 +140,7 @@ postgresql_setup_server <- function(id) {
                      '<b>Host:</b>', postgresql_setup$host, '<br>',
                      '<b>Port:</b>', postgresql_setup$port, '<br>',
                      '<b>Schema:</b>', postgresql_setup$schema,
-                     '<br><br>',
-                     '<b>You may now proceed to record review.</b>',
-                     '<br><br>')
+                     '<br>')
              )
         })
       

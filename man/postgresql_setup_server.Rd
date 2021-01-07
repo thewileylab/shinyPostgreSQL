@@ -15,3 +15,4 @@ PostgreSQL connection variables and DBI connection object.
 \description{
 mod_PostgreSQL_setup Server Function
 }
+\keyword{internal}
