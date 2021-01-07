@@ -1,3 +1,4 @@
+# https://github.com/thewileylab/shinyPostgreSQL
 # Helpers ----
 #' Add external Resources to the Application
 #' 
@@ -85,7 +86,7 @@ postgresql_setup_server <- function(id) {
         ### Module Info
         moduleName = 'PostgreSQL',
         moduleType = 'database',
-        setup_ui = shinyPostgreSQL::postgresql_setup_ui,
+        setup_ui = postgresql_setup_ui,
         ### Connection Variables
         is_connected = 'no',
         db_con = NULL
@@ -119,13 +120,9 @@ postgresql_setup_server <- function(id) {
             }
         })
       
-      pg_connect_error <- eventReactive(postgresql_setup$db_con_class, {
-        req(postgresql_setup$db_con_class == 'character')
-        if(postgresql_export$db_con == 'connection_error' | postgresql_export$db_con == 'connection_warning') {
-          return(HTML("<font color='#e83a2f'>Please verify your PostgreSQL settings. For assistance with parameters, contact your database administrator.</font>"))
-        } else {
-          return(NULL)
-          }
+      pg_connect_error <- reactive({
+        req(postgresql_setup$db_con_class == 'html')
+        postgresql_export$db_con
         })
       
       pg_connected_message <- eventReactive(postgresql_export$is_connected, {
@@ -146,7 +143,6 @@ postgresql_setup_server <- function(id) {
       
       ## Observe Connect Button ----
       observeEvent(input$pg_connect, {
-        # browser()
         # Depending on PostgreSQL config, this tryCatch will be insufficient. Eg, my local PostgreSQL install will accept totally blank
         # connection info as valid, forming a temporary connection. Ideally, this would be combined with dbListTables() to verify that 
         # tables exist before storing a connection object.
@@ -158,6 +154,7 @@ postgresql_setup_server <- function(id) {
                            port = input$port, # or any other port specified by your DBA
                            user = input$username,
                            password = input$password,
+                           timezone_out = 'UTC',
                            options = glue::glue('-c search_path={input$schema}') ## ensure this works with tbl(con, 'table_name') convention
                            )
             } else {
@@ -166,15 +163,14 @@ postgresql_setup_server <- function(id) {
                              host = input$host, # e.g., 'ec2-54-83-201-96.compute-1.amazonaws.com'
                              port = input$port, # or any other port specified by your DBA
                              user = input$username,
+                             timezone_out = 'UTC',
                              password = input$password
                              )
               }
-          }, warning = function(w) {
-            message(glue::glue('{w}'))
-            return('connection_warning')
           }, error = function(e) {
             message(glue::glue('{e}'))
-            return('connection_error')
+            connection_error <- HTML(glue::glue("<font color='#e83a2f'>{e}<br>Please verify your PostgreSQL settings. For assistance with parameters, contact your database administrator.</font>"))
+            return(connection_error)
             }
           )
         })
