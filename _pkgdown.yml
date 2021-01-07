@@ -1,0 +1,32 @@
+url: docs
+template:
+  params:
+    bootswatch: flatly
+home:
+  links:
+  - text: Additional WileyLab tools
+    href: https://www.thewileylab.org/software
+authors:
+  The Wiley Lab:
+    href: https://www.thewileylab.org/
+    html: <img src="https://raw.githubusercontent.com/thewileylab/shinyPostgreSQL/master/man/figures/WileyLab.svg" height="24" />
+navbar:
+  structure:
+    right: [articles, reference, github]
+reference:
+  - title: "Package Information"
+    contents:
+      - shinyPostgreSQL
+  - title: "Start Using shinyPostgreSQL"
+    desc: >
+      Execute this function to launch shinyPostgreSQL.
+    contents: 
+      - run_app
+  - title: "Module UI Functions"
+    desc: "Add these functions to the UI portion of your Shiny Application with the appropriate namespace."
+    contents: 
+      - postgresql_setup_ui
+  - title: "Module Server Function"
+    desc: "Add the server function to the server portion of your Shiny Application with the appropriate namespace."
+    contents:
+      - postgresql_setup_server

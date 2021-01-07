@@ -16,3 +16,12 @@ run_app <- function(
     golem_opts = list(...)
   )
 }
+#' shinyPostgreSQL: Access PostgreSQL databases with R Shiny
+#' 
+#' A shiny module to authenticate your R Shiny Application with a PostgreSQL database.
+#' 
+#' 
+#' @docType package
+#' @name shinyPostgreSQL
+NULL
+#> NULL
