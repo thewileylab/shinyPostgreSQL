@@ -1,4 +1,4 @@
-url: docs
+destination: docs
 template:
   params:
     bootswatch: flatly
