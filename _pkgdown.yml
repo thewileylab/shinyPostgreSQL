@@ -22,11 +22,8 @@ reference:
       Execute this function to launch shinyPostgreSQL.
     contents: 
       - run_app
-  - title: "Module UI Functions"
-    desc: "Add these functions to the UI portion of your Shiny Application with the appropriate namespace."
+  - title: "Module Functions"
+    desc: "Add these functions to the UI and Server portions of your Shiny Application with the appropriate namespace."
     contents: 
-      - postgresql_setup_ui
-  - title: "Module Server Function"
-    desc: "Add the server function to the server portion of your Shiny Application with the appropriate namespace."
-    contents:
-      - postgresql_setup_server
+      - mod_postgres
+ 

@@ -1,6 +1,6 @@
 Package: shinyPostgreSQL
 Title: shinyPostgreSQL: Access a PostgreSQL database through R Shiny
-Version: 0.0.1.0000
+Version: 0.0.2.0000
 Authors@R: c(
             person('David', 'Mayer', email = 'david.mayer@cuanschutz.edu', role = c('cre', 'aut')),
             person(given = "The Wiley Lab", role = c("cph", "fnd"))
@@ -9,7 +9,7 @@ Description: A shiny module to authenticate your R Shiny Application with a Post
 License: MIT + file LICENSE
 Imports: 
     config,
-    golem (>= 0.2.1.90),
+    golem,
     shiny (>= 1.5.0),
     shinyjs,
     shinydashboard,
@@ -19,9 +19,9 @@ Imports:
     glue,
     magrittr,
     shinycssloaders
-Remotes: Thinkr-open/golem
 Encoding: UTF-8
 LazyData: true
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Suggests: 
     htmltools,
