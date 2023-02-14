@@ -1,6 +1,7 @@
-destination: docs
+url: shinypostgresql.thewileylab.org
 template:
   params:
+    bootstrap: 5
     bootswatch: flatly
 home:
   links:
@@ -12,6 +13,7 @@ authors:
     html: <img src="https://raw.githubusercontent.com/thewileylab/shinyPostgreSQL/master/man/figures/WileyLab.svg" height="24" />
 navbar:
   structure:
+    left: [search]
     right: [articles, reference, github]
 reference:
   - title: "Package Information"
