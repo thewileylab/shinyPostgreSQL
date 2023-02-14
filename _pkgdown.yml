@@ -14,7 +14,9 @@ authors:
 navbar:
   structure:
     left: [search]
-    right: [articles, reference, github]
+    right: [reference, github]
+  components:
+    home: ~
 reference:
   - title: "Package Information"
     contents:
