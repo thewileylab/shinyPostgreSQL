@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>shinypostgresql.thewileylab.org/404.html</loc>
+  </url>
+  <url>
+    <loc>shinypostgresql.thewileylab.org/CODE_OF_CONDUCT.html</loc>
+  </url>
+  <url>
+    <loc>shinypostgresql.thewileylab.org/LICENSE-text.html</loc>
+  </url>
+  <url>
+    <loc>shinypostgresql.thewileylab.org/LICENSE.html</loc>
+  </url>
+  <url>
+    <loc>shinypostgresql.thewileylab.org/authors.html</loc>
+  </url>
+  <url>
+    <loc>shinypostgresql.thewileylab.org/index.html</loc>
+  </url>
+  <url>
+    <loc>shinypostgresql.thewileylab.org/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>shinypostgresql.thewileylab.org/reference/mod_postgres.html</loc>
+  </url>
+  <url>
+    <loc>shinypostgresql.thewileylab.org/reference/run_app.html</loc>
+  </url>
+  <url>
+    <loc>shinypostgresql.thewileylab.org/reference/shinyPostgreSQL.html</loc>
+  </url>
+</urlset>
